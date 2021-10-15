@@ -14,14 +14,14 @@ public class DaoFileImpl implements Dao{
     public static final String FILE = "dvds.txt";
 
     @Override
-    public void addDVD(DVD dvd) throws DaoException{
+    public void addDVD(DVD dvd) throws DaoFilePersistenceException{
         readData();
         DVDs.put(dvd.getTitle(),dvd);
         writeData();
     }
 
     @Override
-    public DVD removeDVD (String title) throws DaoException{
+    public DVD removeDVD (String title) throws DaoFilePersistenceException{
       readData();
       DVD exDVD = DVDs.remove(title);
       writeData();
@@ -29,47 +29,35 @@ public class DaoFileImpl implements Dao{
     }
 
     @Override
-    public DVD editDVD(DVD dvd) throws DaoException {
-
-        return null;
-    }
-
-    @Override
-    public Collection<String> listDVDs ()throws DaoException{//coded with relation to the interface
+    public Collection<String> listDVDs ()throws DaoFilePersistenceException{
         readData();
         return DVDs.keySet();
     }
 
     @Override
-    public DVD getDVDFromTitle(String title) throws DaoException{
+    public DVD getDVDFromTitle(String title) throws DaoFilePersistenceException{
         readData();
         return DVDs.get(title);
     }
 
     public DVD unMarshall(String dvdString) {
         String[] elements = dvdString.split(DELIMITER,-2);
-        DVD dvd = new DVD(elements[0]);
-        dvd.setReleaseData(elements[1]);
-        dvd.setmPPARating(elements[2]);
-        dvd.setDirector(elements[3]);
-        dvd.setStudio(elements[4]);
-        dvd.setUserNote(elements[5]);
+        DVD dvd = new DVD(elements[0],elements[1],elements[2],elements[3],elements[4],elements[5]);
         return dvd;
     }
 
-    public void readData() throws DaoException{
+    public void readData() throws DaoFilePersistenceException{
         Scanner scanner = null;
         try {
             scanner = new Scanner(new BufferedReader(new FileReader(FILE)));
         } catch (FileNotFoundException e) {
-            throw new DaoException("Could not find file");
+            throw new DaoFilePersistenceException("Could not find file");
         }
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             DVD newDVD = unMarshall(line);
             DVDs.put(newDVD.getTitle(),newDVD);
         }
-
     }
 
     public String marshall(DVD dvd) {
@@ -83,12 +71,12 @@ public class DaoFileImpl implements Dao{
         return dvdAsText;
     }
 
-    public void writeData () throws DaoException {
+    public void writeData () throws DaoFilePersistenceException {
         PrintWriter writer;
         try {
             writer = new PrintWriter(new FileWriter(FILE));
         }catch (IOException e) {
-            throw new DaoException("Could not save data");
+            throw new DaoFilePersistenceException("Could not save data");
         }
         Collection<String> allDVDs = listDVDs();
         for (String dvd: allDVDs) {

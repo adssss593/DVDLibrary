@@ -1,22 +1,24 @@
 package com.aj.dvd.controller;
 
+import com.aj.dvd.dao.AuditDao;
 import com.aj.dvd.dao.Dao;
-import com.aj.dvd.dao.DaoException;
-import com.aj.dvd.dao.DaoFileImpl;
+import com.aj.dvd.dao.DaoFilePersistenceException;
 import com.aj.dvd.dto.DVD;
+import com.aj.dvd.servicelayer.DaoValidationException;
+import com.aj.dvd.servicelayer.DuplicateTitleException;
+import com.aj.dvd.servicelayer.ServiceLayer;
 import com.aj.dvd.ui.View;
 
 import java.util.Collection;
 
-
 public class Controller {
 
-    View view;
-    Dao dao;
+    private View view;
+    private ServiceLayer serviceLayer;
 
-    public Controller(View view, Dao dao) {
+    public Controller(View view, ServiceLayer serviceLayer) {
         this.view = view;
-        this.dao = dao;
+        this.serviceLayer = serviceLayer;
     }
 
     public void run() {
@@ -49,62 +51,72 @@ public class Controller {
                         break;
                     case 7:
                         whilstRunning = false;
-                        exit();
+                        view.exitingMessage();
                         break;
                     default:
                         System.out.println("default message");
-
                 }
             }
-        } catch (DaoException e) {
+        } catch (DaoFilePersistenceException e) {
             view.displayErrorMessage(e.getMessage());
         }
     }
 
-    public void addDVD() throws DaoException {
+    public void addDVD() throws DaoFilePersistenceException {
         boolean adding = true;
         do {
             DVD newDVD = view.getNewDVD();
-            dao.addDVD(newDVD);
-            adding = view.addDVDSuccess();
+            try {
+                serviceLayer.createDVD(newDVD);
+                adding = view.addDVDSuccess();
+            } catch (DuplicateTitleException | DaoValidationException e) {
+                view.displayErrorMessage(e.getMessage());
+                adding = false;
+            }
         } while (adding);
     }
 
-    public void removeDVD() throws DaoException{
+    public void editDVD() throws DaoFilePersistenceException {
+        String title = view.getTitle();
+        DVD dvd = null;
+        try {
+            dvd = serviceLayer.checkForExistence(title);
+            DVD editedDVD = view.editDVD(dvd);
+            try {
+                serviceLayer.editDVD(editedDVD);
+            } catch (DaoFilePersistenceException
+                    e) {
+                view.displayErrorMessage(e.getMessage());
+            }
+        } catch (DaoValidationException e) {
+            view.displayErrorMessage(e.getMessage());
+        }
+    }
+
+    public void removeDVD() throws DaoFilePersistenceException {
         boolean removing = true;
         do {
             String title = view.getTitle();
-            DVD exDVD = dao.removeDVD(title);
+            DVD exDVD = serviceLayer.removeDVD(title);
             removing = view.dvdRemoveMessage(exDVD);
         }
         while (removing);
     }
 
-    public void editDVD() throws DaoException{
-        String title = view.getTitle();
-        DVD dvd = dao.getDVDFromTitle(title);
-        DVD editedDVD = view.editDVD(dvd);
-        dao.addDVD(editedDVD);
-    }
-
-    public void listDVDs() throws DaoException{
-        Collection<String> dvds = dao.listDVDs();
+    public void listDVDs() throws DaoFilePersistenceException {
+        Collection<String> dvds = serviceLayer.listDVDs();
         view.listDVDs(dvds);
     }
 
-    public void displayDVD() throws DaoException{
+    public void displayDVD() throws DaoFilePersistenceException {
         String title = view.getTitle();
-        DVD dvd = dao.getDVDFromTitle(title);
+        DVD dvd = serviceLayer.getDVDFromTitle(title);
         view.displayDVDInfo(dvd);
     }
 
-    public void searchDVD() throws DaoException{
+    public void searchDVD() throws DaoFilePersistenceException {
         String title = view.getTitle();
-        DVD dvd = dao.getDVDFromTitle(title);
+        DVD dvd = serviceLayer.getDVDFromTitle(title);
         view.dvdSearch(dvd);
-    }
-
-    public void exit() {
-        view.exitingMessage();
     }
 }

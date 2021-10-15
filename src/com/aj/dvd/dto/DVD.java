@@ -8,6 +8,15 @@ public class DVD {
         this.title = title;
     }
 
+    public DVD(String title, String releaseDate, String mPPARating, String director, String studio, String userNote) {
+        this.title = title;
+        this.releaseDate = releaseDate;
+        this.mPPARating = mPPARating;
+        this.director = director;
+        this.studio = studio;
+        this.userNote = userNote;
+    }
+
     public String getTitle() {
         return title;
     }

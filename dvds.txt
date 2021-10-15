@@ -1,2 +1,2 @@
-Gladiator::2001::16::Ridely Scott::Warner Bros::Won best picture
+Gladiator::2001::16::Ridely Scott::Warner Bros::Won oscar
 Harry Potter 1::2003::PG::Chris Columbus::Paramount::no

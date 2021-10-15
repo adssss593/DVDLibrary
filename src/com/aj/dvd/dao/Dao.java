@@ -5,9 +5,8 @@ import com.aj.dvd.dto.DVD;
 import java.util.Collection;
 
 public interface Dao {
-    public void addDVD(DVD dvd)throws DaoException;
-    public DVD removeDVD(String title) throws DaoException;
-    public DVD editDVD(DVD dvd)throws DaoException;
-    public Collection<String> listDVDs()throws DaoException;
-    public DVD getDVDFromTitle (String title)throws DaoException;
+    public void addDVD(DVD dvd)throws DaoFilePersistenceException;
+    public DVD removeDVD(String title) throws DaoFilePersistenceException;
+    public Collection<String> listDVDs()throws DaoFilePersistenceException;
+    public DVD getDVDFromTitle (String title)throws DaoFilePersistenceException;
 }

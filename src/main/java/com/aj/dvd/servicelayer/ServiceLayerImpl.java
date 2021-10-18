@@ -22,9 +22,7 @@ public class ServiceLayerImpl implements ServiceLayer{
     @Override
     public void createDVD(DVD dvd) throws DaoFilePersistenceException, DaoValidationException, DuplicateTitleException {
         validateDVD(dvd);
-        if (dao.getDVDFromTitle(dvd.getTitle()) != null) {
-            throw new DuplicateTitleException("ERROR: Film already exists!!");
-        }
+        checkForNonExistence(dvd);
         dao.addDVD(dvd);
         auditDao.auditEntry(dvd.getTitle() + "added.");
     }
@@ -61,12 +59,18 @@ public class ServiceLayerImpl implements ServiceLayer{
 
     @Override
     public DVD checkForExistence(String title) throws DaoFilePersistenceException,DaoValidationException {
-        System.out.println("function called");
         DVD possibleDVD = dao.getDVDFromTitle(title);
-        System.out.println("dvd should now be null");
         if (possibleDVD == null) {
             throw new DaoValidationException("ERROR: film does not exist");
         }
         return possibleDVD;
     }
+
+    public void checkForNonExistence(DVD dvd) throws DaoFilePersistenceException, DuplicateTitleException{
+        if (dao.getDVDFromTitle(dvd.getTitle()) != null) {
+            throw new DuplicateTitleException("ERROR: Film already exists!!");
+        }
+    }
+
+
 }

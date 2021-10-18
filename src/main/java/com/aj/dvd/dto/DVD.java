@@ -1,5 +1,7 @@
 package com.aj.dvd.dto;
 
+import java.util.Objects;
+
 public class DVD {
 
     private String title,releaseDate,mPPARating,director,studio,userNote;
@@ -73,5 +75,18 @@ public class DVD {
                 "\nDirector: " + this.director +
                 "\nStudio: " + this.studio +
                 "\nFurther remarks: " + this.userNote;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DVD dvd = (DVD) o;
+        return Objects.equals(getTitle(), dvd.getTitle()) && Objects.equals(getReleaseDate(), dvd.getReleaseDate()) && Objects.equals(getmPPARating(), dvd.getmPPARating()) && Objects.equals(getDirector(), dvd.getDirector()) && Objects.equals(getStudio(), dvd.getStudio()) && Objects.equals(getUserNote(), dvd.getUserNote());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTitle(), getReleaseDate(), getmPPARating(), getDirector(), getStudio(), getUserNote());
     }
 }

@@ -11,13 +11,22 @@ public class DaoFileImpl implements Dao{
 
     Map<String, DVD> DVDs = new HashMap<>();
     public static final String DELIMITER = "::";
-    public static final String FILE = "dvds.txt";
+    public final String FILE;
+
+    public DaoFileImpl() {
+        this.FILE = "dvds.txt";
+    }
+
+    public DaoFileImpl(String FILE) {
+        this.FILE = FILE;
+    }
 
     @Override
-    public void addDVD(DVD dvd) throws DaoFilePersistenceException{
+    public DVD addDVD(DVD dvd) throws DaoFilePersistenceException{
         readData();
-        DVDs.put(dvd.getTitle(),dvd);
+        DVD prevDVD = DVDs.put(dvd.getTitle(),dvd);
         writeData();
+        return prevDVD;
     }
 
     @Override
